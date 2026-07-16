@@ -1,0 +1,58 @@
+name: CI Pipeline
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - develop
+      - main
+  push:
+    branches:
+      - 'release/*.*.*'
+  workflow_dispatch: # Permite también correrlo desde la web de GitHub
+
+jobs:
+  ruff-check:
+    name: Ruff check
+    uses: Biwares-AI/shared-workflows/.github/workflows/ruff.yaml@develop
+    secrets:
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      GCP_REGISTRY_REGION: ${{ secrets.GCP_REGISTRY_REGION }}
+      GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+
+  security-audit:
+    name: pip-audit
+    uses: Biwares-AI/shared-workflows/.github/workflows/pip-audit.yaml@develop
+    secrets:
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      GCP_REGISTRY_REGION: ${{ secrets.GCP_REGISTRY_REGION }}
+      GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+
+  run-tests:
+    needs: [ruff-check, security-audit]
+    name: Run tests
+    uses: Biwares-AI/shared-workflows/.github/workflows/run_tests.yaml@develop
+    with:
+      test-path: './tests/'
+      app-path: './app/'
+    secrets:
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      GCP_REGISTRY_REGION: ${{ secrets.GCP_REGISTRY_REGION }}
+      GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+
+  build-image:
+    needs: [run-tests]
+    name: Build image
+    uses: Biwares-AI/shared-workflows/.github/workflows/build_image_on_pr.yaml@develop
+    with:
+      event_name: ${{ github.event_name }}
+      event_action: ${{ github.event.action || '' }}
+      base_ref: ${{ github.event.pull_request.base.ref || '' }}
+      head_ref: ${{ github.event.pull_request.head.ref || '' }}
+      pr_merged: ${{ github.event.pull_request.merged || 'false' }}
+      ref_name: ${{ github.ref_name }}
+      image-name: 'dashboard-bqb'
+      dockerfile-path: './Dockerfile'
+    secrets:
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      GCP_REGISTRY_REGION: ${{ secrets.GCP_REGISTRY_REGION }}
+      GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}

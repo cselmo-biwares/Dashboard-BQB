@@ -1,0 +1,65 @@
+version: 2
+
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+      timezone: "UTC"
+
+    target-branch: "main"
+
+    # Limit to minor and patch (hotfix) version bumps only — ignores major updates
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+      # Ignore internal deps because there's no current support for pip GAR registries
+      - dependency-name: "chatmessaging"
+        versions: [">=0.0.0"]
+      - dependency-name: "datashaper"
+        versions: [">=0.0.0"]
+
+    # group all minor and patch updates into a single PR
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+    # add reviewers and assignees to PRs
+    assignees:
+       - "nPironio"
+       - "jfabt"
+
+    labels:
+      - "dependencies"
+      - "python"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+      timezone: "UTC"
+
+    target-branch: "main"
+
+    # group all updates into a single PR
+    groups:
+      update:
+        update-types:
+          - "major"
+          - "minor"
+          - "patch"
+
+    assignees:
+       - "nPironio"
+       - "jfabt"
+
+    labels:
+      - "dependencies"
+      - "github-actions"

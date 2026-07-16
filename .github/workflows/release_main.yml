@@ -1,0 +1,18 @@
+name: Tag Main after Release PR Merge
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  create-tag-release-image:
+    name: Create tag release and image
+    uses: Biwares-AI/shared-workflows/.github/workflows/release_main.yaml@develop
+    with:
+      branch_name: ${{ github.event.pull_request.head.ref }}
+      image_name: 'dashboard-bqb'
+    secrets:
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      GCP_REGISTRY_REGION: ${{ secrets.GCP_REGISTRY_REGION }}
+      GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}

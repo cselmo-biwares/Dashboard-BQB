@@ -1,0 +1,9 @@
+pytest==9.0.3
+pytest-asyncio==1.4.0
+pytest-cov==7.1.0
+ruff==0.14.2
+pre-commit==4.3.0
+
+fakeredis==2.32.0
+
+-r requirements.txt

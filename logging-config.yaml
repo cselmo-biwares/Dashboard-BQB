@@ -1,0 +1,51 @@
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  colored:
+      (): colorlog.ColoredFormatter
+      format: "%(log_color)s%(asctime)s | %(levelname)-8s%(reset)s | %(cyan)s%(filename)s:%(lineno)d%(reset)s | %(message)s"
+      datefmt: "%Y-%m-%d %H:%M:%S"
+      log_colors:
+        DEBUG: blue
+        INFO: green
+        WARNING: yellow
+        ERROR: red
+        CRITICAL: bold_red
+
+  json_format:
+    format: '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "file": "%(filename)s", "line": %(lineno)d, "trace_id": "%(otelTraceID)s", "span_id": "%(otelSpanID)s", "message": "%(message)s"}'
+    datefmt: "%Y-%m-%d %H:%M:%S"
+
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: colored
+    stream: ext://sys.stdout
+
+loggers:
+  uvicorn:
+    level: INFO
+    handlers:
+      - console
+    propagate: false
+
+  uvicorn.access:
+    level: INFO
+    handlers:
+      - console
+    propagate: false
+
+  fastapi:
+    level: INFO
+    handlers:
+      - console
+    propagate: false
+
+
+root:
+  level: INFO
+  handlers:
+    - console

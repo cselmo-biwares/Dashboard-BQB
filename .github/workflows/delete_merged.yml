@@ -1,0 +1,9 @@
+name: Delete Merged Branches
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  cleanup:
+    uses: Biwares-AI/shared-workflows/.github/workflows/delete_merged.yaml@develop
