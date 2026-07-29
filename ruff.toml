@@ -19,6 +19,7 @@ exclude = [
     "buck-out",
     "build",
     "dist",
+    "migrations",
     "site-packages",
     "venv",
 ]

@@ -4,4 +4,4 @@ _src_path: git+ssh://git@github.com/Biwares-AI/template-backend-python/
 image_name: dashboard-bqb
 project_description: Dashboard para buquebús
 project_name: Dashboard BQB
-service_name: dashboard-otel
+service_name: dashboard-bqb

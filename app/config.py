@@ -8,8 +8,8 @@ from chatmessaging.communication.configurator import ConfigurationUpdateReader, 
 from chatmessaging.http.client.configurator import RTConfiguratorClient
 from chatmessaging.http.schemas.configurator import ModuleType
 
-from pydantic import Field, AnyHttpUrl, RedisDsn, BaseModel
-from pydantic_settings import BaseSettings
+from pydantic import Field, AnyHttpUrl, RedisDsn, PostgresDsn, BaseModel
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from redis import asyncio as redis
 from redis.asyncio import Redis
 from tenacity import AsyncRetrying, wait_exponential, before_sleep_log, retry_if_exception_type
@@ -23,6 +23,48 @@ class ConfiguratorSettings(BaseModel):
     enabled: bool = Field(description="Enable dynamic configuration. If False, use defaults.", default=False)
     url: AnyHttpUrl = Field(description="URL of the configurator", default=AnyHttpUrl("http://localhost:8000"))
     timeout: int = Field(description="Timeout in seconds", default=60)
+
+
+class ConversationManagerSettings(BaseModel):
+    """Conversation Manager client settings."""
+
+    url: AnyHttpUrl = Field(
+        description="URL of the Conversation Manager service", default=AnyHttpUrl("http://localhost:8001")
+    )
+    timeout: int = Field(description="Timeout in seconds", default=30)
+
+
+class BedrockSettings(BaseModel):
+    """AWS Bedrock (AnthropicBedrock) settings."""
+
+    region_name: str = Field(description="AWS region for Bedrock", default="us-east-1")
+    access_key_id: str = Field(description="AWS access key id", default="")
+    secret_access_key: str = Field(description="AWS secret access key", default="")
+    model: str = Field(description="Bedrock model id", default="")
+    max_tokens: int = Field(description="Max tokens per completion", default=4000)
+    temperature: float = Field(description="Sampling temperature", default=0.0)
+
+
+class IngestionSettings(BaseModel):
+    """Conversation ingestion pipeline settings."""
+
+    min_age_hours: int = Field(description="Minimum conversation age (hours) before processing it", default=2)
+    page_size: int = Field(description="Conversations fetched per page from the Conversation Manager", default=50)
+    lock_ttl_seconds: int = Field(description="TTL of the Redis lock guarding concurrent ingestion runs", default=3600)
+
+
+class AuthSettings(BaseModel):
+    """Authentication settings.
+
+    No defaults for secrets/admin credentials: a misconfigured deployment should fail to
+    start loudly, rather than silently run with a weak/well-known default.
+    """
+
+    jwt_secret: str = Field(description="Secret used to sign session JWTs")
+    jwt_algorithm: str = Field(description="JWT signing algorithm", default="HS256")
+    session_hours: int = Field(description="Hours before a session token expires", default=12)
+    admin_username: str = Field(description="The single admin account's username")
+    admin_password: str = Field(description="The single admin account's password")
 
 
 class RedisPoolConfig(BaseModel):
@@ -42,6 +84,13 @@ class RedisPoolConfig(BaseModel):
 class Settings(BaseSettings):
     """Application settings. Automatically retrieved form environment variables."""
 
+    # env_file lets Settings() load .env directly (e.g. when invoked from `alembic`,
+    # which doesn't go through uvicorn's --env-file flag). Real environment variables
+    # (Docker/K8s) still take precedence over the file when both are present.
+    model_config = SettingsConfigDict(
+        env_nested_delimiter="__", env_file=".env", env_file_encoding="utf-8", extra="ignore"
+    )
+
     app_name: str
     env: Literal["local", "dev", "qa", "prod"] = Field(
         description="Environment the service is running in", default="local"
@@ -50,6 +99,17 @@ class Settings(BaseSettings):
     configurator: ConfiguratorSettings = Field(description="Configurator settings", default=ConfiguratorSettings())
     redis_url: RedisDsn = Field(description="Redis URL", default="redis://localhost:6379")
     redis_pool: RedisPoolConfig = Field(description="Redis connection pool settings", default=RedisPoolConfig())
+
+    db_url: PostgresDsn = Field(
+        description="Destination Postgres URL (async driver)",
+        default=PostgresDsn("postgresql+asyncpg://postgres:postgres@localhost:5432/dashboard_bqb"),
+    )
+    conversation_manager: ConversationManagerSettings = Field(
+        description="Conversation Manager client settings", default=ConversationManagerSettings()
+    )
+    bedrock: BedrockSettings = Field(description="AWS Bedrock settings", default=BedrockSettings())
+    ingestion: IngestionSettings = Field(description="Ingestion pipeline settings", default=IngestionSettings())
+    auth: AuthSettings
 
 
 class DynamicConfig(BaseModel):
