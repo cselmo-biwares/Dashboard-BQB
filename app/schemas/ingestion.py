@@ -5,7 +5,9 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-ConversationStatusLiteral = Literal["in_progress", "closed_timeout", "closed_agent", "redirected"]
+ConversationStatusLiteral = Literal[
+    "in_progress", "closed_timeout", "closed_assistant", "closed_operator", "redirected"
+]
 
 
 class IngestionUpdateRequest(BaseModel):

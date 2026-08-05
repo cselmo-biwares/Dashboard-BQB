@@ -28,7 +28,8 @@ const STATUS_CLASS: Record<IngestionRunOut["status"], string> = {
 const CONVERSATION_STATUSES: ConversationStatus[] = [
   "in_progress",
   "closed_timeout",
-  "closed_agent",
+  "closed_assistant",
+  "closed_operator",
   "redirected",
 ];
 

@@ -146,7 +146,7 @@ export interface DocumentClassifyResult {
   assigned_leaf_paths: string[];
 }
 
-export type ConversationStatus = "in_progress" | "closed_timeout" | "closed_agent" | "redirected";
+export type ConversationStatus = "in_progress" | "closed_timeout" | "closed_assistant" | "closed_operator" | "redirected";
 
 export interface IngestionUpdateRequest {
   source?: string;
