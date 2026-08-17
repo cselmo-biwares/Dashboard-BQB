@@ -1,10 +1,10 @@
-pytest==9.0.3
+pytest==9.1.1
 pytest-asyncio==1.4.0
 pytest-cov==7.1.0
-ruff==0.14.2
-pre-commit==4.3.0
+ruff==0.16.3
+pre-commit==4.6.2
 
-fakeredis==2.32.0
+fakeredis==2.37.0
 aiosqlite==0.22.1
 
 -r requirements.txt
