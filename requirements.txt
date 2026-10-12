@@ -1,28 +1,28 @@
 gunicorn==23.0.0
-uvicorn==0.37.0
-fastapi==0.133.0
+uvicorn==0.54.0
+fastapi==0.143.0
 httpx==0.28.1
-certifi==2026.2.25
+certifi==2026.7.22
 
-colorlog==6.9.0
+colorlog==6.12.0
 PyYAML==6.0.3
 
-pydantic==2.12.5
-pydantic-settings==2.11.0
-python-dotenv==1.2.2
+pydantic==2.14.0
+pydantic-settings==2.15.0
+python-dotenv==1.2.4
 
-opentelemetry-sdk==1.37.0
-opentelemetry-api==1.37.0
-opentelemetry-instrumentation-fastapi==0.58b0
-opentelemetry-instrumentation-httpx==0.58b0
-opentelemetry-exporter-otlp-proto-grpc==1.37.0
+opentelemetry-sdk==1.45.1
+opentelemetry-api==1.45.1
+opentelemetry-instrumentation-fastapi==0.66b1
+opentelemetry-instrumentation-httpx==0.66b1
+opentelemetry-exporter-otlp-proto-grpc==1.45.1
 
 chatmessaging==0.7.0
 
-sqlalchemy[asyncio]==2.0.51
-asyncpg==0.31.0
-alembic==1.18.5
-anthropic[bedrock]==0.116.0
+sqlalchemy[asyncio]==2.1.4
+asyncpg==0.32.0
+alembic==1.20.0
+anthropic[bedrock]==0.125.0
 
 bcrypt==5.0.0
-pyjwt==2.13.0
+pyjwt==2.15.1
